@@ -1,11 +1,10 @@
 import { Router } from "express";
-import { publicGetFileUrlController } from "../../controllers/files.controller.js";
 import v1Routes from "./v1/index.js";
 
 const publicRoutes = Router();
 
-publicRoutes.use(`${process.env.BASE_PATH}/v1`, v1Routes);
+const publicBasePath = process.env.PUBLIC_BASE_PATH || "/api/v1";
 
-publicRoutes.use("/files/:fileId/view", publicGetFileUrlController);
+publicRoutes.use(publicBasePath, v1Routes);
 
 export default publicRoutes;

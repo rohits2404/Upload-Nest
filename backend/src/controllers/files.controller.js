@@ -78,6 +78,7 @@ export const downloadFilesController = asyncHandler(async (req, res) => {
 });
 
 export const publicGetFileUrlController = asyncHandler(async (req, res) => {
+    console.log("[PUBLIC VIEW CONTROLLER REACHED]");
     const fileId = fileIdSchema.parse(req.params.fileId);
     const { stream, contentType, fileSize } = await getFileUrlService(fileId);
 

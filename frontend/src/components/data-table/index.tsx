@@ -131,7 +131,7 @@ export function DataTable<TData extends Record<string, any>>({
             columnVisibility,
             rowSelection: selection ? resolvedRowSelection : {},
         },
-        getRowId: (row: any) => row._id,
+        getRowId: (row: any) => row.id,
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
         onColumnVisibilityChange: setColumnVisibility,

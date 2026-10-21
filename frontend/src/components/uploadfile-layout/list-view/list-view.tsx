@@ -38,7 +38,7 @@ export const ListView = (props: Props) => {
     const rowSelection = useMemo<RowSelectionState>(() => {
         const state: RowSelectionState = {};
         selectedFiles.forEach((file) => {
-            state[file._id] = true;
+            state[file.id] = true;
         });
         return state;
     }, [selectedFiles]);
@@ -58,7 +58,7 @@ export const ListView = (props: Props) => {
             typeof updater === "function" ? updater(rowSelection) : updater;
         const selectedIds = Object.keys(nextState);
         const selectedObjects = data.filter((file: FileType) =>
-            selectedIds.includes(file?._id),
+            selectedIds.includes(file?.id),
         );
         setSelectedFiles(selectedObjects);
     };

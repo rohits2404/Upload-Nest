@@ -57,6 +57,7 @@ export const FileCard = ({
             <div className="absolute top-3 left-3 z-10">
                 <Checkbox
                     checked={isSelected}
+                    onClick={(event) => event.stopPropagation()}
                     onCheckedChange={() => toggleFileSelection(file)}
                     className={cn(
                         "backdrop-blur-sm cursor-pointer border dark:border-gray-300 shadow-sm size-6 bg-white",

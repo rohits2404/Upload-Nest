@@ -66,10 +66,18 @@ export const uploadFilesService = async (userId, files, uploadedVia) => {
                     mimeType: createdFile.mimeType,
                 };
             } catch (error) {
-                logger.error("Error Uploading File", error);
+                logger.error("Error Uploading File", {
+                    filename: file.originalname,
+                    errorName: error?.name,
+                    errorMessage: error?.message,
+                    errorCode: error?.code || error?.Code,
+                    httpStatusCode: error?.$metadata?.httpStatusCode,
+                });
+
                 if (_storageKey) {
                     await deleteFromS3(_storageKey).catch(() => {});
                 }
+
                 throw error;
             }
         }),
@@ -275,7 +283,15 @@ async function uploadToS3(file, userId, meta) {
 
         return { storageKey };
     } catch (error) {
-        logger.error("AWS Error Failed Upload", error);
+        logger.error("AWS Error Failed Upload", {
+            errorName: error?.name,
+            errorMessage: error?.message,
+            errorCode: error?.code || error?.Code,
+            httpStatusCode: error?.$metadata?.httpStatusCode,
+            requestId: error?.$metadata?.requestId,
+            stack: error?.stack,
+        });
+
         throw error;
     }
 }

@@ -69,12 +69,19 @@ export const UploadFileLayout = (props: Props) => {
     };
 
     const handleToggleSelected = (file: FileType) => {
-        const isSelected = selectedFiles.find((f) => f._id === file._id);
-        if (isSelected) {
-            setSelectedFiles((prev) => prev.filter((f) => f._id !== file._id));
-        } else {
-            setSelectedFiles((prev) => [...prev, file]);
-        }
+        setSelectedFiles((prev) => {
+            const alreadySelected = prev.some(
+                (selectedFile) => selectedFile.id === file.id,
+            );
+
+            if (alreadySelected) {
+                return prev.filter(
+                    (selectedFile) => selectedFile.id !== file.id,
+                );
+            }
+
+            return [...prev, file];
+        });
     };
 
     const handleClear = () => {
@@ -84,62 +91,70 @@ export const UploadFileLayout = (props: Props) => {
     const handleCopy = () => {
         const urls = selectedFiles
             .map((file) => {
-                return `${import.meta.env.VITE_BASE_API_URL}/files/${file._id}/view`;
+                return `${import.meta.env.VITE_API_URL}/files/${file.id}/view`;
             })
             .join("\n");
         navigator.clipboard
             .writeText(urls)
             .then(() => {
                 setSelectedFiles([]);
-                toast.success(`Copied ${selectedFiles.length} file url `);
+                toast.success(`Copied ${selectedFiles.length} File Url `);
             })
             .catch(() => {
-                toast.error("Failed to copy links");
+                toast.error("Failed To Copy Links");
             });
     };
 
     const handleDelete = () => {
         if (isDeleting) return;
-        const fileIds = selectedFiles?.map((file) => file._id);
-        if (!fileIds.length) {
-            toast.error("No file selected");
+        const fileIds = [
+            ...new Set(
+                selectedFiles
+                    .map((file) => file.id)
+                    .filter((id): id is string => Boolean(id)),
+            ),
+        ];
+
+        if (fileIds.length === 0) {
+            toast.error("No Valid Files Selected");
             return;
         }
 
         const toastId = toast.loading(
-            `Deleting ${fileIds.length} selected file(s)...`,
+            `Deleting ${fileIds.length} Selected File(s)...`,
         );
+
         deleteFiles(fileIds)
             .unwrap()
             .then((res) => {
                 toast.dismiss(toastId);
                 if (res.failedCount > 0) {
                     toast.warning(
-                        `Deleted ${res.deletedCount} file(s). ${res.failedCount} failed.`,
-                        { description: "Some files could not be deleted." },
+                        `Deleted ${res.deletedCount} File(s). ${res.failedCount} Failed.`,
+                        { description: "Some Files Could Not Be Deleted." },
                     );
                 } else {
                     toast.success(
-                        `Successfully deleted ${res.deletedCount} file(s).`,
+                        `Successfully Deleted ${res.deletedCount} File(s).`,
                     );
                 }
                 setSelectedFiles([]);
             })
             .catch(() => {
                 toast.dismiss(toastId);
-                toast.error("Failed to delete files. Please try again.");
+                toast.error("Failed To Delete Files. Please Try Again.");
             });
     };
 
     const handleDowload = () => {
         if (isDownloading) return;
-        const fileIds = selectedFiles?.map((file) => file._id);
+        const fileIds = selectedFiles?.map((file) => file.id);
         if (!fileIds.length) {
-            toast.error("No file selected");
+            toast.error("No File Selected");
             return;
         }
 
-        const toastId = toast.loading("Preparing your download...", {
+        const toastId = toast.loading("Preparing Your Download...", {
             duration: Infinity,
         });
 
@@ -156,31 +171,31 @@ export const UploadFileLayout = (props: Props) => {
                     link.remove();
 
                     const message = res.isZip
-                        ? "Zip file is downloading..."
-                        : "Your file is downloading...";
+                        ? "Zip File Is Downloading..."
+                        : "Your File Is Downloading...";
 
                     toast.success(
                         <>
                             {message}
                             <br />
-                            If it doesn't start,{" "}
+                            If It Doesn't Start,{" "}
                             <a
                                 href={res.downloadUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="underline text-black!"
                             >
-                                click here
+                                Click Here
                             </a>
                         </>,
                     );
                 } else {
-                    toast.error("Download URL missing");
+                    toast.error("Download URL Missing");
                 }
             })
             .catch(() => {
                 toast.dismiss(toastId);
-                toast.error("Download failed Try again");
+                toast.error("Download Failed Try Again");
             })
             .finally(() => {
                 setSelectedFiles([]);

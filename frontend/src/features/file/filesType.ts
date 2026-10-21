@@ -18,19 +18,19 @@ export interface UploadResponse {
 }
 
 export interface FileType {
-    _id: string;
+    id: string;
     userId: string;
     originalName: string;
     size: number;
     formattedSize: string;
     ext: string;
     mimeType: string;
-    url: string;
+    url: string | null;
     createdAt: string;
     updatedAt: string;
-    id?: string;
     uploadedVia: "WEB" | "API";
 }
+
 export interface GetAllFilesResponse {
     message: string;
     files: FileType[];

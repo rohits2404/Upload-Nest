@@ -1,11 +1,16 @@
 import { z } from "zod";
 
-export const fileIdSchema = z.string().trim().min(1);
+// PostgreSQL UUID validation
+export const fileIdSchema = z.string().trim().uuid("Invalid File ID");
 
 const baseSchema = z.object({
     fileIds: z
-        .array(z.string().length(24, "Invaild File ID "))
-        .min(1, "At Least One File ID Must Be Provided"),
+        .array(fileIdSchema)
+        .min(1, "At Least One File ID Must Be Provided")
+        .refine(
+            (ids) => new Set(ids).size === ids.length,
+            "Duplicate File IDs Are Not Allowed",
+        ),
 });
 
 export const deleteFilesSchema = baseSchema;

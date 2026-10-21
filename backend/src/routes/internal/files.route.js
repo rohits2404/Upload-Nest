@@ -5,6 +5,7 @@ import {
     downloadFilesController,
     getAllFilesController,
     uploadFilesViaWebController,
+    publicGetFileUrlController,
 } from "../../controllers/files.controller.js";
 import { CheckStorageAvailability } from "../../middlewares/check-storage.middleware.js";
 
@@ -20,5 +21,8 @@ filesRoutes.post(
 filesRoutes.post("/download", downloadFilesController);
 filesRoutes.get("/all", getAllFilesController);
 filesRoutes.delete("/bulk-delete", deleteFilesController);
+
+// View a file through your backend
+filesRoutes.get("/:fileId/view", publicGetFileUrlController);
 
 export default filesRoutes;

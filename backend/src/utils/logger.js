@@ -1,4 +1,5 @@
 import winston from "winston";
+import util from "node:util";
 
 const { combine, colorize, timestamp, errors, json, printf } = winston.format;
 
@@ -20,12 +21,16 @@ const consoleFormat = combine(
     errors({ stack: true }),
     printf(({ level, message, stack, timestamp, ...meta }) => {
         const metadata = Object.keys(meta).length
-            ? ` ${JSON.stringify(meta)}`
+            ? ` ${util.inspect(meta, {
+                  depth: 4,
+                  colors: false,
+                  compact: true,
+              })}`
             : "";
 
         return `${timestamp} [${level.toUpperCase()}]: ${
             stack || message
-        }${stack && message !== stack ? "" : ""}${metadata}`;
+        }${metadata}`;
     }),
 );
 

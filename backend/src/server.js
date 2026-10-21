@@ -17,6 +17,8 @@ import publicRoutes from "./routes/public/index.js";
 
 const app = express();
 
+console.log("[BASE_PATH]", process.env.BASE_PATH);
+
 const allowedOrigins = (process.env.CLIENT_URL ?? "")
     .split(",")
     .map((origin) => origin.trim())
@@ -52,6 +54,11 @@ app.get(
         });
     }),
 );
+
+app.use((req, res, next) => {
+    console.log("[REQUEST]", req.method, req.originalUrl);
+    next();
+});
 
 app.use(process.env.BASE_PATH || "/api/v1", internalRoutes);
 app.use(publicRoutes);

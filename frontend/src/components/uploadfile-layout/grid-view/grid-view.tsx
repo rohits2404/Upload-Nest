@@ -27,11 +27,11 @@ export const GridView = (props: Props) => {
             ) : data.length > 0 ? (
                 data.map((file) => {
                     const isSelected = selectedFiles.some(
-                        (selectedFile) => selectedFile._id === file._id,
+                        (selectedFile) => selectedFile.id === file.id,
                     );
                     return (
                         <FileCard
-                            key={file._id}
+                            key={file.id}
                             file={file}
                             isSelected={isSelected}
                             toggleFileSelection={handleFileSelection}
