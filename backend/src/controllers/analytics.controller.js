@@ -4,13 +4,13 @@ import { getUserAnalyticsWithChartService } from "../services/analytics.service.
 
 export const getUserAnalyticsWithChartController = asyncHandler(
     async (req, res) => {
-        const userId = req.user?._id;
+        const userId = req.user?.id;
 
         const { from, to } = req.query;
 
         const filter = {
             dateFrom: from ? new Date(from) : undefined,
-            dateTo: from ? new Date(to) : undefined,
+            dateTo: to ? new Date(to) : undefined,
         };
 
         const result = await getUserAnalyticsWithChartService(userId, filter);

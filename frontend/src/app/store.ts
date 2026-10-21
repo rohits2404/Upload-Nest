@@ -1,6 +1,4 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import authReducer from "../features/auth/authSlice";
-import storage from "./browser-storage";
 import {
     persistReducer,
     persistStore,
@@ -11,6 +9,8 @@ import {
     PURGE,
     REGISTER,
 } from "redux-persist";
+import storage from "./browser-storage";
+import authReducer from "../features/auth/authSlice";
 import { apiClient } from "./api-client";
 
 const rootReducer = combineReducers({
@@ -18,32 +18,32 @@ const rootReducer = combineReducers({
     auth: authReducer,
 });
 
-type RootReducerType = ReturnType<typeof rootReducer>;
-
 const persistConfig = {
     key: "root",
     storage,
-    blacklist: [apiClient.reducerPath],
+    whitelist: ["auth"],
 };
 
-const persistedReducer = persistReducer<RootReducerType>(
-    persistConfig,
-    rootReducer,
-);
-
-const reduxPersistActions = [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER];
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
     reducer: persistedReducer,
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
             serializableCheck: {
-                ignoredActions: reduxPersistActions,
+                ignoredActions: [
+                    FLUSH,
+                    REHYDRATE,
+                    PAUSE,
+                    PERSIST,
+                    PURGE,
+                    REGISTER,
+                ],
             },
         }).concat(apiClient.middleware),
 });
 
 export const persistor = persistStore(store);
 
-export type RootState = ReturnType<typeof store.getState>;
+export type RootState = ReturnType<typeof rootReducer>;
 export type AppDispatch = typeof store.dispatch;

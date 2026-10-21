@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Loader } from "lucide-react";
+import { store } from "@/app/store";
 
 const schema = z.object({
     email: z.string().email("Invalid Email Address"),
@@ -37,22 +38,29 @@ export const SignInForm = ({
 
     const form = useForm<FormValues>({
         resolver: zodResolver(schema),
+        defaultValues: {
+            email: "",
+            password: "",
+        },
     });
 
-    const onSubmit = (values: FormValues) => {
-        login(values)
-            .unwrap()
-            .then((data) => {
-                dispatch(setCredentials(data));
-                toast.success("Login Successful");
-                setTimeout(() => {
-                    navigate(PROTECTED_ROUTES.OVERVIEW);
-                }, 1000);
-            })
-            .catch((error) => {
-                console.log(error);
-                toast.error(error.data?.message || "Failed To Login");
-            });
+    const onSubmit = async (values: FormValues) => {
+        try {
+            const data = await login(values).unwrap();
+
+            console.log("Login response:", data);
+
+            dispatch(setCredentials(data));
+            console.log("Auth state after dispatch:", store.getState().auth);
+
+            console.log("Navigating to:", PROTECTED_ROUTES.OVERVIEW);
+
+            toast.success("Login Successful");
+            navigate(PROTECTED_ROUTES.OVERVIEW, { replace: true });
+        } catch (error: any) {
+            console.error("Login failed:", error);
+            toast.error(error?.data?.message || "Failed To Login");
+        }
     };
 
     return (
