@@ -1,5 +1,6 @@
 import { asyncHandler } from "../middlewares/asyncHander.middleware.js";
 import { HTTPSTATUS } from "../config/http.config.js";
+import { UnauthorizedException } from "../utils/app-error.js";
 import {
     createApiKeySchema,
     deleteApiKeySchema,
@@ -11,7 +12,8 @@ import {
 } from "../services/apikey.service.js";
 
 export const createApiKeyController = asyncHandler(async (req, res) => {
-    const userId = req.user?._id;
+    const userId = req.user?.id;
+    if (!userId) throw new UnauthorizedException("User Not Authenticated");
 
     const { name } = createApiKeySchema.parse(req.body);
 
@@ -24,7 +26,8 @@ export const createApiKeyController = asyncHandler(async (req, res) => {
 });
 
 export const getAllApiKeysController = asyncHandler(async (req, res) => {
-    const userId = req.user?._id;
+    const userId = req.user?.id;
+    if (!userId) throw new UnauthorizedException("User Not Authenticated");
 
     const pagination = {
         pageSize: parseInt(req.query.pageSize) || 10,
@@ -40,7 +43,8 @@ export const getAllApiKeysController = asyncHandler(async (req, res) => {
 });
 
 export const deleteApiKeyController = asyncHandler(async (req, res) => {
-    const userId = req.user?._id;
+    const userId = req.user?.id;
+    if (!userId) throw new UnauthorizedException("User Not Authenticated");
 
     const { id } = deleteApiKeySchema.parse(req.params);
 
